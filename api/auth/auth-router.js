@@ -1,24 +1,23 @@
 const router = require('express').Router();
 const db = require('../../data/dbConfig')
+const bcrypt = require('bcryptjs')
 
 router.post('/register', (req, res) => {
   const { username, password } = req.body
   
   if(username.trim() && password.trim()){
-    const checkUsernameInDatabase = db('users')
+    // Check username into database
+    db('users')
       .where('username', username)
       .then(user => {
         if(!user.length){
-          // Need to hash password here
-
-
-
-          // after password hashed then add new user into database
-          /**const insertUsernameInDatabase = db('users')
+          const hashedPassword = bcrypt.hashSync(password, 12)
+          // Insert new user into db
+          db('users')
             .insert(
               {
                 'username': username,
-                'password': password
+                'password': hashedPassword
               }
             )
             .then(user => {
@@ -30,7 +29,7 @@ router.post('/register', (req, res) => {
                 err: err.message,
                 stack: err.stack
               })
-            })**/
+            })
         }else{
           res.json('username taken')
         }
