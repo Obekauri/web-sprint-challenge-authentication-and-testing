@@ -1,7 +1,46 @@
 const router = require('express').Router();
+const db = require('../../data/dbConfig')
 
 router.post('/register', (req, res) => {
-  res.end('implement register, please!');
+  const { username, password } = req.body
+  
+  if(username.trim() && password.trim()){
+    const checkUsernameInDatabase = db('users')
+      .where('username', username)
+      .then(user => {
+        if(!user.length){
+          // Need to hash password here
+
+
+
+          // after password hashed then add new user into database
+          /**const insertUsernameInDatabase = db('users')
+            .insert(
+              {
+                'username': username,
+                'password': password
+              }
+            )
+            .then(user => {
+              res.status(201).json(user)
+            })
+            .catch(err => {
+              res.status(404).json({
+                message: 'User can not added',
+                err: err.message,
+                stack: err.stack
+              })
+            })**/
+        }else{
+          res.json('username taken')
+        }
+      })
+
+  }else{
+    res.status(500).json({
+      message: "username and password required"
+    })
+  }
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -30,7 +69,7 @@ router.post('/register', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  res.end('implement login, please!');
+  res.json({message: 'POST LOGIN REQUEST'})
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -55,5 +94,7 @@ router.post('/login', (req, res) => {
       the response body should include a string exactly as follows: "invalid credentials".
   */
 });
+
+
 
 module.exports = router;

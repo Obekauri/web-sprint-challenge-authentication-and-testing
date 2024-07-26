@@ -16,4 +16,10 @@ server.use(express.json());
 server.use('/api/auth', authRouter);
 server.use('/api/jokes', restrict, jokesRouter); // only logged-in users should have access!
 
+server.use((req, res) => {
+    res.status(404).json({
+        message: 'Page Not Found'
+    })
+})
+
 module.exports = server;
