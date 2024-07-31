@@ -37,7 +37,7 @@ describe('Users model', () => {
       expect(users[0]).toHaveProperty('username', 'userA')
       expect(users[1]).toHaveProperty('id', 2)
     })
-    test('[3] hashed password saved correctly', async () => {
+    test('[2] hashed password saved correctly', async () => {
       await request(server).post('/api/auth/register').send(userC)
       let user = await db('users')
       const bool = bcrypt.compareSync(userC.password, user[2].password)
@@ -49,12 +49,23 @@ describe('Users model', () => {
       await request(server).post('/api/auth/register').send(userA)
       await request(server).post('/api/auth/register').send(userB)
     })
-    test('[4] Validate user', async () => {
+    test('[3] Validate user', async () => {
       const res = await request(server).post('/api/auth/login').send(userA)
       let user = await db('users')
       const bool = bcrypt.compareSync(userA.password, user[0].password)
       expect(bool).toBe(true)
       expect(res).toHaveProperty('status', 200)
+    })
+    test('[4] Invalid user error status', async () => {
+      const res = await request(server).post('/api/auth/login').send({
+        username: 'userA',
+        password: 'wrongPassword'
+      })
+      let user = await db('users').where('username', 'userA')
+      const bool = bcrypt.compareSync('wrongPassword', user[0].password)
+      expect(bool).toBe(false)
+      expect(res.status + '').toMatch(/4|5/)
+      expect(user).toHaveLength(1)
     })
   })
 })
