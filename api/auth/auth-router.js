@@ -7,7 +7,10 @@ const secrets = require('../../config/secret.js')
 router.post('/register', (req, res, next) => {
   const { username, password } = req.body
   
-  if(username.trim() && password.trim()){
+  if(
+    (typeof username === 'string' || typeof password === 'string') &&
+    (username.trim() && password.trim().length > 3)
+  ){
     // Check username into database
     db('users')
       .where('username', username)
@@ -82,9 +85,11 @@ router.post('/login', (req, res, next) => {
       .then(userValid => {
         if(userValid && bcrypt.compareSync(password, userValid.password)){
           const token = generateToken(userValid)
+          req.session.token = token
+          console.log(req.session)
           res.status(200).json({
             message: `welcome, ${username}`,
-            token: token
+            token
           })
         }else{
           res.status(400).json({
@@ -124,7 +129,7 @@ function generateToken(user) {
 	const payload = {
 		subject: user.id, // sub
 		username: user.username,
-		// ...other data
+    password: user.password
 	}
   const options = {
 		expiresIn: '8h',
