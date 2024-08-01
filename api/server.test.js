@@ -67,7 +67,7 @@ describe('Users model', () => {
       expect(bool).toBe(false)
       expect(res.status + '').toMatch(/4|5/)
       expect(user).toHaveLength(1)
-    }, 750)
+    })
   })
   describe('[GET] Jokes', () => {
     beforeEach(async () => {
