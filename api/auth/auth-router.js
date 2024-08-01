@@ -8,7 +8,7 @@ router.post('/register', (req, res, next) => {
   const { username, password } = req.body
   
   if(
-    (typeof username === 'string' || typeof password === 'string') &&
+    (typeof username === 'string' && typeof password === 'string') &&
     (username.trim() && password.trim().length > 3)
   ){
     // Check username into database
@@ -16,7 +16,7 @@ router.post('/register', (req, res, next) => {
       .where('username', username)
       .then(user => {
         if(!user.length){
-          const hashedPassword = bcrypt.hashSync(password, 12)
+          const hashedPassword = bcrypt.hashSync(password, 7)
           // Insert new user into db
           db('users')
             .insert(
@@ -29,13 +29,16 @@ router.post('/register', (req, res, next) => {
               db('users')
                 .where('id', userId)
                 .then(displayUser => {
+                  res.body = displayUser
                   res.status(201).json(displayUser)
                 })
                 .catch(next)
             })
             .catch(next)
         }else{
-          res.json('username taken')
+          res.json({
+            message: 'username taken'
+          })
         }
       })
 
